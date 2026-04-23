@@ -1,0 +1,87 @@
+<div class="min-h-screen bg-gray-100 p-6">
+  <div class="flex justify-between items-center mb-6">
+    <h1 class="text-3xl font-bold text-gray-800">Employee Management</h1>
+    <a routerLink="/employees/new" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
+      + Add Employee
+    </a>
+  </div>
+  <div class="bg-white rounded-lg shadow p-4 mb-6 flex gap-4">
+    <input type="text" [(ngModel)]="searchTerm" (input)="onSearch()"
+           placeholder="Search by name, employee ID or ID number..."
+           class="flex-1 border rounded-lg px-3 py-2"/>
+    <select [(ngModel)]="departmentFilter" (ngModelChange)="onDepartmentChange()"
+            class="border rounded-lg px-3 py-2">
+      <option value="">All Departments</option>
+      @for (dept of departments; track dept) {
+        <option [value]="dept">{{dept}}</option>
+      }
+    </select>
+  </div>
+  <div class="bg-white rounded-lg shadow overflow-hidden">
+    <table class="w-full">
+      <thead class="bg-gray-50 border-b">
+        <tr>
+          <th class="text-left px-6 py-3 text-gray-600 font-semibold">Emp ID</th>
+          <th class="text-left px-6 py-3 text-gray-600 font-semibold">Name</th>
+          <th class="text-left px-6 py-3 text-gray-600 font-semibold">Email</th>
+          <th class="text-left px-6 py-3 text-gray-600 font-semibold">Department</th>
+          <th class="text-left px-6 py-3 text-gray-600 font-semibold">Position</th>
+          <th class="text-left px-6 py-3 text-gray-600 font-semibold">Status</th>
+          <th class="text-left px-6 py-3 text-gray-600 font-semibold">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        @if (employees && employees.length > 0) {
+          @for (emp of employees; track emp.id) {
+            <tr class="border-b hover:bg-gray-50">
+              <td class="px-6 py-4">
+                <span class="text-xs font-bold text-blue-700 bg-blue-50 px-2 py-1 rounded">
+                  {{ emp.employeeId }}
+                </span>
+              </td>
+              <td class="px-6 py-4 font-medium">{{emp.firstName}} {{emp.middleName}} {{emp.lastName}}</td>
+              <td class="px-6 py-4 text-gray-600">{{emp.email}}</td>
+              <td class="px-6 py-4 text-gray-600">{{emp.department}}</td>
+              <td class="px-6 py-4 text-gray-600">{{emp.position}}</td>
+              <td class="px-6 py-4">
+                <span [class]="'px-2 py-1 rounded-full text-xs font-medium ' + getStatusClass(emp.status || 'Active')">
+                  {{emp.status}}
+                </span>
+              </td>
+              <td class="px-6 py-4">
+                <div class="flex gap-2">
+                  <a [routerLink]="['/employees/edit', emp.id]"
+                     class="bg-yellow-500 text-white px-3 py-1 rounded hover:bg-yellow-600 text-sm">
+                    Edit
+                  </a>
+                  <button (click)="confirmDelete(emp.id!)"
+                          class="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 text-sm">
+                    Delete
+                  </button>
+                </div>
+              </td>
+            </tr>
+          }
+        } @else {
+          <tr>
+            <td colspan="7" class="px-6 py-8 text-center text-gray-500">
+              No employees found. Add your first employee!
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+  @if (showDeleteModal) {
+    <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <div class="bg-white rounded-lg p-6 max-w-sm w-full mx-4">
+        <h3 class="text-lg font-bold text-gray-800 mb-2">Delete Employee?</h3>
+        <p class="text-gray-600 mb-6">This action cannot be undone.</p>
+        <div class="flex gap-3 justify-end">
+          <button (click)="cancelDelete()" class="px-4 py-2 border rounded-lg hover:bg-gray-50">Cancel</button>
+          <button (click)="deleteEmployee()" class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700">Delete</button>
+        </div>
+      </div>
+    </div>
+  }
+</div>

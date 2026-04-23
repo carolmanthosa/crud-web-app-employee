@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, Like } from 'typeorm';
+import { Repository } from 'typeorm';
 import { Employee } from './employee.entity';
 import { CreateEmployeeDto } from './dto/create-employee.dto';
 import { UpdateEmployeeDto } from './dto/update-employee.dto';
@@ -12,20 +12,33 @@ export class EmployeeService {
     private employeeRepository: Repository<Employee>,
   ) {}
 
+  private async generateEmployeeId(): Promise<string> {
+    const year = new Date().getFullYear();
+    const count = await this.employeeRepository.count();
+    const padded = String(count + 1).padStart(3, '0');
+    return `EMP-${year}-${padded}`;
+  }
+
   async findAll(search?: string, department?: string): Promise<Employee[]> {
-    if (search) {
-      return this.employeeRepository.find({
-        where: [
-          { firstName: Like(`%${search}%`) },
-          { lastName: Like(`%${search}%`) },
-          { department: Like(`%${search}%`) },
-        ],
-      });
+    const query = this.employeeRepository.createQueryBuilder('employee');
+
+    if (search && department) {
+      query
+        .where(
+          `employee.firstName LIKE :search OR employee.lastName LIKE :search OR employee.employeeId LIKE :search OR employee.idNumber LIKE :search`,
+          { search: `%${search}%` }
+        )
+        .andWhere('employee.department = :department', { department });
+    } else if (search) {
+      query.where(
+        `employee.firstName LIKE :search OR employee.lastName LIKE :search OR employee.employeeId LIKE :search OR employee.idNumber LIKE :search`,
+        { search: `%${search}%` }
+      );
+    } else if (department) {
+      query.where('employee.department = :department', { department });
     }
-    if (department) {
-      return this.employeeRepository.find({ where: { department } });
-    }
-    return this.employeeRepository.find();
+
+    return query.getMany();
   }
 
   async findOne(id: number): Promise<Employee> {
@@ -37,7 +50,11 @@ export class EmployeeService {
   }
 
   async create(createEmployeeDto: CreateEmployeeDto): Promise<Employee> {
-    const employee = this.employeeRepository.create(createEmployeeDto);
+    const employeeId = await this.generateEmployeeId();
+    const employee = this.employeeRepository.create({
+      ...createEmployeeDto,
+      employeeId,
+    });
     return this.employeeRepository.save(employee);
   }
 

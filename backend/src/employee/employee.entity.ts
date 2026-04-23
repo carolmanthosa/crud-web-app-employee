@@ -3,7 +3,13 @@ import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateCol
 @Entity('employees')
 export class Employee {
   @PrimaryGeneratedColumn()
-id!: number;
+  id!: number;
+
+  @Column({ unique: true })
+  employeeId: string = '';
+
+  @Column({ type: 'varchar', unique: true, nullable: true, default: null })
+  idNumber: string | null = null; // ← added type: 'varchar'
 
   @Column()
   firstName: string = '';

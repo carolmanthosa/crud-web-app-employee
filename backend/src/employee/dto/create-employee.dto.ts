@@ -1,6 +1,10 @@
 import { IsString, IsEmail, IsOptional, IsEnum } from 'class-validator';
 
 export class CreateEmployeeDto {
+  @IsOptional()
+  @IsString()
+  idNumber: string = ''; // ← employee provides their government ID
+
   @IsString()
   firstName: string = '';
 

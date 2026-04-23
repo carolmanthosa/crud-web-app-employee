@@ -1,4 +1,5 @@
-import { Controller, Get, Post, Put, Delete, Body, Param, Query, ParseIntPipe } from '@nestjs/common';
+import { Controller, Get, Post, Put, Delete, Body, Param, Query, ParseIntPipe, Res } from '@nestjs/common';
+import type { Response } from 'express'; // ← change to 'import type'
 import { EmployeeService } from './employee.service';
 import { CreateEmployeeDto } from './dto/create-employee.dto';
 import { UpdateEmployeeDto } from './dto/update-employee.dto';
@@ -13,8 +14,10 @@ export class EmployeeController {
   }
 
   @Get(':id')
-  findOne(@Param('id', ParseIntPipe) id: number) {
-    return this.employeeService.findOne(id);
+  async findOne(@Param('id', ParseIntPipe) id: number, @Res() res: Response) {
+    res.set('Cache-Control', 'no-store');
+    const employee = await this.employeeService.findOne(id);
+    return res.json(employee);
   }
 
   @Post()
