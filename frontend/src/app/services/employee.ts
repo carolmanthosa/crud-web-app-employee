@@ -4,8 +4,8 @@ import { Observable } from 'rxjs';
 
 export interface Employee {
   id?: number;
-  employeeId?: string; // ← added (auto-generated, read-only)
-  idNumber?: string;   // ← added (government ID)
+  employeeId?: string;
+  idNumber?: string;
   firstName: string;
   middleName?: string;
   lastName: string;
@@ -13,7 +13,7 @@ export interface Employee {
   phone?: string;
   department: string;
   position: string;
-  status?: string;
+  status?: string; // ← added back
   profilePicture?: string;
   hireDate?: string;
 }
@@ -22,7 +22,9 @@ export interface Employee {
   providedIn: 'root'
 })
 export class EmployeeService {
-  private apiUrl = 'http://localhost:3000/employees';
+  private apiUrl = window.location.hostname === 'localhost'
+    ? 'http://localhost:3000/employees'
+    : 'http://13.60.40.154:3000/employees';
 
   constructor(private http: HttpClient) {}
 
