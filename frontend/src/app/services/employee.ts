@@ -24,11 +24,11 @@ export interface Employee {
 export class EmployeeService {
   private apiUrl = window.location.hostname === 'localhost'
     ? 'http://localhost:3000/employees'
-    : 'http://13.60.40.154:3000/employees';
+    : 'http://56.228.24.1:3000/employees';
 
   constructor(private http: HttpClient) {}
 
-  getAll(search?: string, department?: string): Observable<Employee[]> {
+  getAll(search?: string, department?: string): Observable<Employee[]> {kkkk
     let params = new HttpParams();
     if (search) params = params.set('search', search);
     if (department) params = params.set('department', department);
