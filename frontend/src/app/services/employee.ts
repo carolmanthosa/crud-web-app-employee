@@ -28,7 +28,7 @@ export class EmployeeService {
 
   constructor(private http: HttpClient) {}
 
-  getAll(search?: string, department?: string): Observable<Employee[]> {kkkk
+  getAll(search?: string, department?: string): Observable<Employee[]> {
     let params = new HttpParams();
     if (search) params = params.set('search', search);
     if (department) params = params.set('department', department);

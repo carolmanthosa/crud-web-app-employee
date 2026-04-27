@@ -19,27 +19,27 @@ export class EmployeeService {
     return `EMP-${year}-${padded}`;
   }
 
-  async findAll(search?: string, department?: string): Promise<Employee[]> {
-    const query = this.employeeRepository.createQueryBuilder('employee');
+ async findAll(search?: string, department?: string): Promise<Employee[]> {
+  const query = this.employeeRepository.createQueryBuilder('employee');
 
-    if (search && department) {
-      query
-        .where(
-          `employee.firstName LIKE :search OR employee.lastName LIKE :search OR employee.employeeId LIKE :search OR employee.idNumber LIKE :search`,
-          { search: `%${search}%` }
-        )
-        .andWhere('employee.department = :department', { department });
-    } else if (search) {
-      query.where(
-        `employee.firstName LIKE :search OR employee.lastName LIKE :search OR employee.employeeId LIKE :search OR employee.idNumber LIKE :search`,
-        { search: `%${search}%` }
-      );
-    } else if (department) {
-      query.where('employee.department = :department', { department });
-    }
-
-    return query.getMany();
+  if (search && department) {
+    query
+      .where(
+        `employee.firstName LIKE :search OR employee.lastName LIKE :search OR employee.employeeId = :exact OR employee.idNumber = :exact`,
+        { search: `%${search}%`, exact: search }
+      )
+      .andWhere('employee.department = :department', { department });
+  } else if (search) {
+    query.where(
+      `employee.firstName LIKE :search OR employee.lastName LIKE :search OR employee.employeeId = :exact OR employee.idNumber = :exact`,
+      { search: `%${search}%`, exact: search }
+    );
+  } else if (department) {
+    query.where('employee.department = :department', { department });
   }
+
+  return query.getMany();
+}
 
   async findOne(id: number): Promise<Employee> {
     const employee = await this.employeeRepository.findOne({ where: { id } });
